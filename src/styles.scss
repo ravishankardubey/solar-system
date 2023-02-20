@@ -1,1 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@include mat.core();
+
+// Custom theme imports
+@import './theme/theme.scss';
+@import './theme/custom-component-themes.scss';
+
+@include mat.all-component-themes($light-theme);
+@include custom-components-theme($light-theme);
+
+.dark-theme {
+  @include mat.all-component-colors($dark-theme);
+  @include custom-components-theme($dark-theme);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
