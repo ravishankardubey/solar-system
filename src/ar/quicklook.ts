@@ -4,10 +4,12 @@ import {
   Color,
   FrontSide,
   Group,
+  MathUtils,
   Matrix4,
   Mesh,
   MeshStandardMaterial,
   OctahedronGeometry,
+  PlaneGeometry,
   Quaternion,
   QuaternionKeyframeTrack,
   TubeGeometry,
@@ -20,6 +22,7 @@ import {
 } from 'three'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { AsteroidSample } from '../asteroids/index.ts'
+import { createLabelTexture } from '../bodies/labelTexture.ts'
 import type { PositionFn } from '../orbits/index.ts'
 
 // Same metres-per-unit as the Android view: Neptune's orbit ≈ 1 m across.
@@ -45,9 +48,17 @@ const BELT_TURNS = 3 // mean belt period ≈ 4.6 yr → ~2.6 per Jupiter year
 const TROJAN_TURNS = 1 // Trojans share Jupiter's orbit
 const TURN_SAMPLES = 8
 const DAY_MS = 86_400_000
+// Name labels: upright plates facing the viewer's starting side (+Z), tilted
+// back so they read from above. Quick Look can't billboard, and single-sided
+// surfaces vanish from behind rather than showing mirrored text.
+const LABEL_HEIGHT = 0.012 / AR_SCALE // 1.2 cm
+const LABEL_TILT = MathUtils.degToRad(-25)
 const UP = new Vector3(0, 1, 0)
 
 export interface ExportBody {
+  name: string
+  radius: number // scene units
+  minor?: boolean // smaller label
   root: Object3D // direct child of the system group, at the body's position
   position: PositionFn
   periodDays?: number
@@ -95,6 +106,25 @@ function spinTrack(target: Object3D, turns: number): KeyframeTrack {
     values.push(q.x, q.y, q.z, q.w)
   }
   return new QuaternionKeyframeTrack(`${target.uuid}.quaternion`, times, values)
+}
+
+function labelPlate(body: ExportBody): Mesh {
+  const { texture, aspect } = createLabelTexture(body.name)
+  const height = LABEL_HEIGHT * (body.minor ? 0.75 : 1)
+  const plate = new Mesh(
+    new PlaneGeometry(height * aspect, height).translate(0, height / 2, 0),
+    new MeshStandardMaterial({
+      color: 0x000000,
+      map: texture,
+      emissive: 0xe8ecf2,
+      emissiveMap: texture,
+      transparent: true,
+    }),
+  )
+  plate.name = `${body.name} label`
+  plate.position.y = body.radius * 1.25 + 1.5
+  plate.rotation.x = LABEL_TILT
+  return plate
 }
 
 // Copies of a mesh with standard materials. USDZ has no unlit or
@@ -147,6 +177,7 @@ function buildExport(input: QuickLookInput): {
       group.add(...exportMeshes(obj as Mesh, matrix))
     })
     group.name = group.children[0]?.name ?? 'Body'
+    group.add(labelPlate(body))
     root.add(group)
 
     const turns = body.periodDays ? Math.round(LOOP_DAYS / body.periodDays) : 0

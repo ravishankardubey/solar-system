@@ -537,7 +537,6 @@ body.in-ar {
   background: transparent;
 
   .body-nav,
-  .info-panel,
   .credits,
   .ar-button {
     display: none;
@@ -595,9 +594,31 @@ body.in-ar {
   text-shadow: 0 1px 6px rgb(0 0 0 / 0.9);
 }
 
-.ar-move {
+.ar-actions {
   position: absolute;
-  top: 72px;
   left: 50%;
+  bottom: calc(var(--credits-height, 0px) + 148px);
   transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+
+  &[hidden] {
+    display: none;
+  }
+
+  [aria-pressed='true'] {
+    border-color: #ffb74d;
+    color: #ffb74d;
+  }
+}
+
+.ar-hint[hidden] {
+  display: none;
+}
+
+/* The info panel moves into the overlay; keep it below the top controls. */
+.ar-overlay .info-panel {
+  top: 72px;
+  max-height: min(36dvh, calc(100dvh - 72px - 210px));
 }

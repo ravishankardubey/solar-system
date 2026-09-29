@@ -15,7 +15,12 @@ import { detectArMode, type ArMode } from './ar/index.ts'
 import { startWebXr, type WebXrSession } from './ar/webxr.ts'
 import { loadAsteroids, type AsteroidField } from './asteroids/index.ts'
 import { setMaxAnisotropy } from './assets/index.ts'
-import { createBodies, updateBodies } from './bodies/index.ts'
+import {
+  AR_LABEL_ACTIVE_COLOR,
+  AR_LABEL_COLOR,
+  createBodies,
+  updateBodies,
+} from './bodies/index.ts'
 import {
   CameraController,
   OVERVIEW_POSITION,
@@ -82,20 +87,30 @@ const cameraController = new CameraController(camera, canvas, reducedMotion)
 
 // Selection drives the camera, info panel, list and labels together.
 // null returns to the overview.
+// In AR the camera is the phone, so only the panel and AR zoom button follow.
 function select(id: string | null): void {
   const view = id ? views.get(id) : undefined
-  cameraController.focusOn(
-    view
-      ? {
-          object: view.root,
-          radius: view.radius,
-          viewDistance: view.radius * (view.data.rings ? 8 : 5),
-        }
-      : null,
-  )
+  if (xrSession) {
+    xrSession.setSelected(id)
+  } else {
+    cameraController.focusOn(
+      view
+        ? {
+            object: view.root,
+            radius: view.radius,
+            viewDistance: view.radius * (view.data.rings ? 8 : 5),
+          }
+        : null,
+    )
+  }
   infoPanel.show(id)
   bodyList.setActive(id)
-  for (const [key, v] of views) v.label.classList.toggle('active', key === id)
+  for (const [key, v] of views) {
+    v.label.classList.toggle('active', key === id)
+    v.arLabel.material.color.set(
+      key === id ? AR_LABEL_ACTIVE_COLOR : AR_LABEL_COLOR,
+    )
+  }
   goalInset = panelInset()
 }
 
@@ -155,6 +170,9 @@ async function enterAr(mode: ArMode): Promise<void> {
     await openQuickLook({
       system,
       bodies: [...views.values()].map((v) => ({
+        name: v.data.name,
+        radius: v.radius,
+        minor: v.data.minor,
         root: v.root,
         position: v.position,
         periodDays: v.data.orbitalPeriodDays,
@@ -172,10 +190,21 @@ async function enterAr(mode: ArMode): Promise<void> {
       scene,
       camera,
       system,
-      timePanel: timeControls.element,
+      panels: [timeControls.element, infoPanel.element],
+      bodies: [...views.values()].map((v) => ({
+        id: v.data.id,
+        name: v.data.name,
+        root: v.root,
+        radius: v.radius,
+      })),
+      onSelect: select,
+      onLabels: (on) => {
+        for (const v of views.values()) v.arLabel.visible = on
+      },
       onEnd: () => {
         xrSession = undefined
         setArView(false)
+        select(null)
       },
     })
   } catch (err) {

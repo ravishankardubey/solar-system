@@ -26,19 +26,19 @@ Quick map of the codebase. Update this file whenever files or modules are added,
 
 Modules stay small and independent. UI talks only to `clock` and `camera`, never to Three.js directly.
 
-| Module       | Status    | Responsibility                                                                                                                                                                      |
-| ------------ | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `main.ts`    | M4        | Renderer, label overlay, lights, portrait FOV fit, `select(id)` wiring, panel view inset; frame: clock → bodies → UI → camera → render                                              |
-| `style.css`  | M2        | Full-screen canvas, label overlay and label style, credits                                                                                                                          |
-| `clock/`     | done (M3) | `SimClock` + `SPEEDS`: date, speed preset, direction, play/pause, faster/slower/reverse/now                                                                                         |
-| `orbits/`    | M4+       | `planetPosition`/`elementsPosition` → `PositionFn`, `iauOrientation`/`elementsOrientation` → `OrientationFn`, `createOrbitLine`, `toSceneDistance`; `kepler.ts` shared Kepler math  |
-| `bodies/`    | M4+       | `data.json` (planets + Ceres/Vesta with `orbit`/`rotation`) + `data.ts`, `createBodies` → `Map<id, BodyView>`, `updateBodies`, `rings.ts`, `sunGlow.ts`                             |
-| `camera/`    | done (M4) | `CameraController` (OrbitControls, fly-to tween, follow), `onBodyClick` screen-space picking, `OVERVIEW_POSITION`                                                                   |
-| `ui/`        | M4+       | `timeControls.ts`, `bodyList.ts` (list, 0–8 keys, phone menu toggle), `infoPanel.ts` (facts, Esc), `credits.ts` (`CREDITS_HTML`; footer hidden on phones)                           |
-| `assets/`    | M2        | `loadTexture(name)` from the 1K set; 2K streaming and KTX2 in M5                                                                                                                    |
-| `sky/`       | M2        | `createSky`: Milky Way background + seeded starfield (caller keeps it centred on the camera)                                                                                        |
-| `asteroids/` | done      | `loadAsteroids`: fetch packed data, GPU Kepler shader `Points`; `update(date)` sets days since epoch                                                                                |
-| `ar/`        | new       | `detectArMode` (webxr / quicklook), `webxr.ts` live AR session (hit-test, DOM overlay, place/move/scale), `quicklook.ts` animated USDZ export (60 s Jupiter-year loop, lazy-loaded) |
+| Module       | Status    | Responsibility                                                                                                                                                                                                                                         |
+| ------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `main.ts`    | M4        | Renderer, label overlay, lights, portrait FOV fit, `select(id)` wiring, panel view inset; frame: clock → bodies → UI → camera → render                                                                                                                 |
+| `style.css`  | M2        | Full-screen canvas, label overlay and label style, credits                                                                                                                                                                                             |
+| `clock/`     | done (M3) | `SimClock` + `SPEEDS`: date, speed preset, direction, play/pause, faster/slower/reverse/now                                                                                                                                                            |
+| `orbits/`    | M4+       | `planetPosition`/`elementsPosition` → `PositionFn`, `iauOrientation`/`elementsOrientation` → `OrientationFn`, `createOrbitLine`, `toSceneDistance`; `kepler.ts` shared Kepler math                                                                     |
+| `bodies/`    | M4+       | `data.json` (planets + Ceres/Vesta with `orbit`/`rotation`) + `data.ts`, `createBodies` → `Map<id, BodyView>`, `updateBodies`, `rings.ts`, `sunGlow.ts`                                                                                                |
+| `camera/`    | done (M4) | `CameraController` (OrbitControls, fly-to tween, follow), `onBodyClick` screen-space picking, `OVERVIEW_POSITION`                                                                                                                                      |
+| `ui/`        | M4+       | `timeControls.ts`, `bodyList.ts` (list, 0–8 keys, phone menu toggle), `infoPanel.ts` (facts, Esc), `credits.ts` (`CREDITS_HTML`; footer hidden on phones)                                                                                              |
+| `assets/`    | M2        | `loadTexture(name)` from the 1K set; 2K streaming and KTX2 in M5                                                                                                                                                                                       |
+| `sky/`       | M2        | `createSky`: Milky Way background + seeded starfield (caller keeps it centred on the camera)                                                                                                                                                           |
+| `asteroids/` | done      | `loadAsteroids`: fetch packed data, GPU Kepler shader `Points`; `update(date)` sets days since epoch                                                                                                                                                   |
+| `ar/`        | new       | `detectArMode` (webxr / quicklook), `webxr.ts` live AR session (hit-test, DOM overlay, place/move/scale, tap-to-select, zoom-to-body follow, 3D labels toggle), `quicklook.ts` animated USDZ export (60 s Jupiter-year loop, name plates, lazy-loaded) |
 
 ## Milestone progress
 
@@ -52,6 +52,8 @@ Modules stay small and independent. UI talks only to `clock` and `camera`, never
 
 ## Next up
 
+- Verify on Android: AR tap-to-select, Zoom to / Show all, labels toggle (untested on hardware).
+- App path options researched 2026-09-30: PWA (~1 day, recommended first), Capacitor store apps (~1–2 weeks, loses WebXR in WebViews), native Unity/AR Foundation (~6–10 weeks, only route to live AR on iPhone).
 - Major moons (~20): Moon + Galilean via astronomy-engine, others from JPL mean elements; own compressed distance scale; fade in near their planet; textures from Solar System Scope (Moon) and NASA/USGS maps. See the moons feasibility notes in the 2026-09-30 session.
 - Labels clutter on phones in the overview (consider the v1 labels toggle or hiding minor labels when zoomed out).
 

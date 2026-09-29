@@ -7,6 +7,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Added
 
+- AR interaction and labels:
+  - Android (WebXR): after placing, tap a planet to open its info panel over the camera view (2.5° minimum hit angle so small planets stay tappable; empty tap closes it). "Zoom to <planet>" scales the system so that body is ~5 cm across and keeps it at the placement spot while the rest orbits around it; "Show all" returns. 3D name labels (camera-facing sprites, constant on-screen size, drawn on top; selected one in amber) with a Labels toggle. Not yet tested on a device.
+  - iPhone (Quick Look): name plates baked into the USDZ, riding with each planet through the animation; upright facing the starting view and tilted back 25°. Single-sided, so they vanish from behind rather than mirror. Checked: 11 labels, 0 validation errors, fixed offset above each moving body; file ~11 MB.
+  - `src/bodies/labelTexture.ts`: shared canvas label texture.
 - AR view (`src/ar`), shown only on devices that support it:
   - Android (Chrome, ARCore): live WebXR AR. Point at a surface, tap to place; the system floats ~15 cm above it at ~1 m across. Time keeps running with the time panel over the camera view; Exit, Move and −/+ size buttons.
   - iPhone/iPad: a USDZ of the current moment (planets, rings, emissive Sun, orbit tubes, 1,000 sampled asteroids; ~10.9 MB, ~2 s to build) opened in AR Quick Look with pinch-to-scale. It plays a seamless 60 s loop covering one Jupiter year: Mercury 49, Venus 19, Earth 12, Mars 6, Ceres/Vesta 3 and Jupiter 1 real orbits (speeds nudged a few percent, Ceres ~16%, so the loop closes); the belt turns 3× and the Trojans 1× as rigid groups; Saturn, Uranus and Neptune stay still. No time controls or labels. The USDZ exporter is loaded only on iOS.

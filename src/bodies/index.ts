@@ -6,6 +6,8 @@ import {
   MeshBasicMaterial,
   MeshStandardMaterial,
   SphereGeometry,
+  Sprite,
+  SpriteMaterial,
   type Object3D,
 } from 'three'
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
@@ -20,6 +22,7 @@ import {
   type PositionFn,
 } from '../orbits/index.ts'
 import { BODIES, type BodyData } from './data.ts'
+import { createLabelTexture } from './labelTexture.ts'
 import { createRings } from './rings.ts'
 import { createSunGlow } from './sunGlow.ts'
 
@@ -43,6 +46,7 @@ export interface BodyView {
   pole: Group
   mesh: Mesh
   label: HTMLElement
+  arLabel: Sprite // 3D label, only shown in WebXR AR
   position: PositionFn
   orientation: OrientationFn
 }
@@ -69,6 +73,34 @@ function orientationOf(body: BodyData): OrientationFn {
 }
 
 const geometry = new SphereGeometry(1, 64, 32)
+
+// Label height as a fraction of viewing distance: stays readable at any
+// distance, ~2.2 cm tall seen from 1 m.
+const AR_LABEL_SIZE = 0.022
+export const AR_LABEL_COLOR = 0xe8ecf2
+export const AR_LABEL_ACTIVE_COLOR = 0xffb74d
+
+// WebXR can't place HTML labels, so AR uses camera-facing sprites of constant
+// on-screen size, drawn on top of everything.
+function createArLabel(body: BodyData, height: number): Sprite {
+  const { texture, aspect } = createLabelTexture(body.name)
+  const size = AR_LABEL_SIZE * (body.minor ? 0.75 : 1)
+  const sprite = new Sprite(
+    new SpriteMaterial({
+      map: texture,
+      color: AR_LABEL_COLOR,
+      sizeAttenuation: false,
+      depthTest: false,
+      transparent: true,
+    }),
+  )
+  sprite.center.set(0.5, 0)
+  sprite.scale.set(size * aspect, size, 1)
+  sprite.position.y = height
+  sprite.renderOrder = 10
+  sprite.visible = false
+  return sprite
+}
 
 function createLabel(body: BodyData, height: number): CSS2DObject {
   const el = document.createElement('div')
@@ -110,8 +142,10 @@ export function createBodies(
     pole.add(mesh)
 
     const root = new Group()
-    const label = createLabel(body, radius * 1.25 + 1.5)
-    root.add(pole, label)
+    const labelHeight = radius * 1.25 + 1.5
+    const label = createLabel(body, labelHeight)
+    const arLabel = createArLabel(body, labelHeight)
+    root.add(pole, label, arLabel)
     if (body.emissive) root.add(createSunGlow(radius * 7))
     parent.add(root)
 
@@ -128,6 +162,7 @@ export function createBodies(
       pole,
       mesh,
       label: label.element,
+      arLabel,
       position,
       orientation: orientationOf(body),
     })
