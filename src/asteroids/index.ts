@@ -40,6 +40,7 @@ const vertexShader = /* glsl */ `
   uniform float uPixelRatio;
   uniform float uOffset;
   uniform float uFactor;
+  uniform float uAr;          // 1 in AR: lighter, larger dots for real floors
 
   attribute vec4 orbit;       // a (AU), e, mean motion (rad/day), M0 (rad)
   attribute vec3 axisP;       // toward perihelion, scene axes
@@ -62,8 +63,10 @@ const vertexShader = /* glsl */ `
     vec3 scenePos = p / r * (uOffset + uFactor * sqrt(r));
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(scenePos, 1.0);
-    gl_PointSize = size * uPixelRatio;
-    vColor = color;
+    gl_PointSize = size * uPixelRatio * (1.0 + 0.5 * uAr);
+    // Dimmed rock colours suit black space but read as dark specks (dirt)
+    // over a camera feed, so AR lifts them toward white.
+    vColor = mix(color, vec3(1.0), 0.5 * uAr);
   }
 `
 
@@ -87,6 +90,7 @@ export interface AsteroidSample {
 
 export interface AsteroidField {
   update(date: Date): void
+  setArMode(on: boolean): void
   // Every nth asteroid's position at `date`, computed on the CPU with the
   // same math as the shader (for exports that can't run it, e.g. USDZ).
   sample(date: Date, maxCount: number): AsteroidSample
@@ -167,6 +171,7 @@ export async function loadAsteroids(
       uPixelRatio: { value: pixelRatio },
       uOffset: { value: DISTANCE_OFFSET },
       uFactor: { value: DISTANCE_FACTOR },
+      uAr: { value: 0 },
     },
     transparent: true,
     depthWrite: false,
@@ -189,6 +194,9 @@ export async function loadAsteroids(
   return {
     update(date) {
       material.uniforms.uDays.value = julianDay(date) - header.epochJd
+    },
+    setArMode(on) {
+      material.uniforms.uAr.value = on ? 1 : 0
     },
     sample(date, maxCount) {
       const step = Math.max(1, Math.ceil(header.count / maxCount))

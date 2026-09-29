@@ -160,6 +160,7 @@ function setArView(on: boolean): void {
   stars.visible = !on
   scene.background = on ? null : skyBackground
   labelRenderer.domElement.hidden = on
+  asteroids?.setArMode(on)
   document.body.classList.toggle('in-ar', on)
   if (!on) resize()
 }

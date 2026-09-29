@@ -32,6 +32,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Fixed
 
+- AR (Android): asteroids looked like dark specks on light floors; in AR they are now lifted toward white and drawn 1.5× larger.
 - AR (Android): time-panel buttons were restyled as AR pills (border, 42 px) because the overlay's button rule reached the panel moved into it; AR styles now apply only to the AR controls.
 - AR (Android): 3D labels were invisible: sprites without size attenuation still multiply by parent scale, and AR shrinks the system ~1/500. Labels now divide out the system scale every frame (`fitArLabels`).
 - Time panel on phones: buttons were squeezed and icons pushed right because the shrink-to-fit panel at `left: 50%` was capped at half the screen. It now has a fixed width (≤ 320 px), centred with margins, and buttons don't shrink.
