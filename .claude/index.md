@@ -34,7 +34,7 @@ Modules stay small and independent. UI talks only to `clock` and `camera`, never
 | `orbits/`    | M4+       | `planetPosition`/`elementsPosition` → `PositionFn`, `iauOrientation`/`elementsOrientation` → `OrientationFn`, `createOrbitLine`, `toSceneDistance`; `kepler.ts` shared Kepler math |
 | `bodies/`    | M4+       | `data.json` (planets + Ceres/Vesta with `orbit`/`rotation`) + `data.ts`, `createBodies` → `Map<id, BodyView>`, `updateBodies`, `rings.ts`, `sunGlow.ts`                            |
 | `camera/`    | done (M4) | `CameraController` (OrbitControls, fly-to tween, follow), `onBodyClick` screen-space picking, `OVERVIEW_POSITION`                                                                  |
-| `ui/`        | M4        | `timeControls.ts`, `bodyList.ts` (list + 0–8 keys), `infoPanel.ts` (facts, Esc), `credits.ts`                                                                                      |
+| `ui/`        | M4+       | `timeControls.ts`, `bodyList.ts` (list, 0–8 keys, phone menu toggle), `infoPanel.ts` (facts, Esc), `credits.ts` (`CREDITS_HTML`; footer hidden on phones)                          |
 | `assets/`    | M2        | `loadTexture(name)` from the 1K set; 2K streaming and KTX2 in M5                                                                                                                   |
 | `sky/`       | M2        | `createSky`: Milky Way background + seeded starfield (caller keeps it centred on the camera)                                                                                       |
 | `asteroids/` | done      | `loadAsteroids`: fetch packed data, GPU Kepler shader `Points`; `update(date)` sets days since epoch                                                                               |

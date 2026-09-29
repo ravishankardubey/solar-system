@@ -45,6 +45,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Changed
 
+- Phone layout: "Solar System" title top-left, menu button top-right opening the body list (planets, Ceres, Vesta) with the credits inside; footer credits hidden on phones. Menu closes on selection, outside tap, or Esc.
 - Bodies get a position function (`planetPosition` via astronomy-engine, or `elementsPosition` from Kepler elements) and an orientation function (`iauOrientation` or `elementsOrientation` from IAU constants).
 - Number-key shortcuts come from `shortcut` in `data.json` (0–8 stay Sun…Neptune).
 - Body orientation no longer uses `axialTiltDeg` (kept as a display fact); the tilt group is now a pole group driven by the rotation model.
