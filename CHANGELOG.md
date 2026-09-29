@@ -7,6 +7,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Added
 
+- M4 interaction:
+  - Click a planet (screen-space hit test, min 16 px target so small planets are easy to hit) or its label to select it; drags don't select.
+  - Camera flies to the selected body over 1.4 s (ease in-out), viewing it 40° off the Sun line so the terminator shows, then follows it as it moves while orbit/zoom still work. Reduced motion skips the flight.
+  - Info panel (`src/ui/infoPanel.ts`) with type, description and facts (radius, mass, gravity, day, year, distance, temperature, moons, tilt) from NASA fact sheets. Close button or Esc returns to the overview.
+  - Body list (`src/ui/bodyList.ts`): accessible buttons for Sun…Neptune; chip bar on phones. Keys 0–8 select bodies.
+  - The view's centre shifts into the space the info panel leaves free (left of it on desktop, below it on phones).
+- `src/bodies/data.ts`: typed body data with no Three.js import, so the UI can use it.
+
+### Fixed
+
+- Time shortcuts stopped working while any button had focus; now only Space/Enter are left to a focused button.
 - M3 motion and time:
   - Planets move every frame to their `astronomy-engine` positions for the sim date.
   - Real body orientation from the IAU rotation model (`RotationAxis`): true pole direction and prime-meridian spin, so day/night sides and Saturn's ring angle match the date. Checked: sub-solar point on Earth lands within ~1° of the expected longitude/latitude at equinox, solstices, and an arbitrary date.

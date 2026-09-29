@@ -12,3 +12,4 @@ Static Three.js + Vite + TypeScript 3D solar system explorer. See `BRIEF.md` for
 - Keep `.claude/index.md` in sync when adding, moving, or removing files/modules, or completing a milestone.
 - No backend, no runtime API calls. All data is static JSON; orbital math runs client-side.
 - Style: Prettier (no semicolons, single quotes); relative imports keep the `.ts` extension.
+- Commits carry only the user's name: no `Co-Authored-By: Claude` trailers or "Generated with Claude Code" lines.

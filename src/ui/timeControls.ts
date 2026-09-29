@@ -80,8 +80,9 @@ export function mountTimeControls(
   window.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return
     const target = e.target as Element
-    // Let focused buttons and form fields handle their own keys.
-    if (target.closest('button, input, textarea, select')) return
+    // Form fields keep their keys; a focused button keeps Space/Enter.
+    if (target.closest('input, textarea, select')) return
+    if (target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return
     const run = SHORTCUTS[e.key.toLowerCase()]
     if (!run) return
     e.preventDefault()

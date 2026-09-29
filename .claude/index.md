@@ -24,24 +24,24 @@ Quick map of the codebase. Update this file whenever files or modules are added,
 
 Modules stay small and independent. UI talks only to `clock` and `camera`, never to Three.js directly.
 
-| Module      | Status    | Responsibility                                                                                                                                 |
-| ----------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `main.ts`   | M3        | Renderer, label overlay, lights, camera, portrait FOV fit; frame: tick clock → update bodies → UI → render                                     |
-| `style.css` | M2        | Full-screen canvas, label overlay and label style, credits                                                                                     |
-| `clock/`    | done (M3) | `SimClock` + `SPEEDS`: date, speed preset, direction, play/pause, faster/slower/reverse/now                                                    |
-| `orbits/`   | done (M3) | `heliocentricPosition`, `bodyOrientation` (IAU pole + spin), `toSceneDistance`, `createOrbitLine`                                              |
-| `bodies/`   | M3        | `data.json`, `createBodies` → `Map<id, BodyView>` (root/pole/mesh + label), `updateBodies(views, date)`, `rings.ts`, `sunGlow.ts`; moons in M6 |
-| `camera/`   | M2        | `createCameraController`: OrbitControls with damping, zoom limits, arrow-key pan; focus tween in M4                                            |
-| `ui/`       | M3        | `timeControls.ts` (panel + keyboard), `credits.ts`; info panel and body list in M4                                                             |
-| `assets/`   | M2        | `loadTexture(name)` from the 1K set; 2K streaming and KTX2 in M5                                                                               |
-| `sky/`      | M2        | `createSky`: Milky Way background + seeded starfield (caller keeps it centred on the camera)                                                   |
+| Module      | Status    | Responsibility                                                                                                                                                               |
+| ----------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `main.ts`   | M4        | Renderer, label overlay, lights, portrait FOV fit, `select(id)` wiring, panel view inset; frame: clock → bodies → UI → camera → render                                       |
+| `style.css` | M2        | Full-screen canvas, label overlay and label style, credits                                                                                                                   |
+| `clock/`    | done (M3) | `SimClock` + `SPEEDS`: date, speed preset, direction, play/pause, faster/slower/reverse/now                                                                                  |
+| `orbits/`   | done (M3) | `heliocentricPosition`, `bodyOrientation` (IAU pole + spin), `toSceneDistance`, `createOrbitLine`                                                                            |
+| `bodies/`   | M4        | `data.json` facts + `data.ts` (Three-free types/`BODIES`), `createBodies` → `Map<id, BodyView>` (radius, root/pole/mesh, label el), `updateBodies`, `rings.ts`, `sunGlow.ts` |
+| `camera/`   | done (M4) | `CameraController` (OrbitControls, fly-to tween, follow), `onBodyClick` screen-space picking, `OVERVIEW_POSITION`                                                            |
+| `ui/`       | M4        | `timeControls.ts`, `bodyList.ts` (list + 0–8 keys), `infoPanel.ts` (facts, Esc), `credits.ts`                                                                                |
+| `assets/`   | M2        | `loadTexture(name)` from the 1K set; 2K streaming and KTX2 in M5                                                                                                             |
+| `sky/`      | M2        | `createSky`: Milky Way background + seeded starfield (caller keeps it centred on the camera)                                                                                 |
 
 ## Milestone progress
 
 - [x] 1. Project setup (repo, CI, GitHub Pages deploy)
 - [x] 2. Static scene
 - [x] 3. Motion and time
-- [ ] 4. Interaction
+- [x] 4. Interaction
 - [ ] 5. MVP polish and launch
 - [ ] 6. v1 features (done early: Saturn rings, labels (no toggle yet), starfield skybox)
 
@@ -50,4 +50,5 @@ Modules stay small and independent. UI talks only to `clock` and `camera`, never
 Not urgent. Do not start these unless the user asks.
 
 - [ ] Custom domain or subdomain (for example under ravishankardubey.in).
+- [ ] Re-check moon counts in `src/bodies/data.json` (Jupiter 95, Saturn 274, Uranus 29, Neptune 16 as of 2025) before launch.
 - [ ] Analytics: none, or a privacy-friendly option with no cookie banner.

@@ -14,22 +14,9 @@ import {
   createOrbitLine,
   heliocentricPosition,
 } from '../orbits/index.ts'
-import data from './data.json'
+import { BODIES, type BodyData } from './data.ts'
 import { createRings } from './rings.ts'
 import { createSunGlow } from './sunGlow.ts'
-
-export interface BodyData {
-  id: string
-  name: string
-  radiusKm: number
-  axialTiltDeg: number
-  orbitalPeriodDays?: number
-  texture: string
-  emissive?: boolean
-  rings?: { innerKm: number; outerKm: number; texture: string }
-}
-
-export const BODIES: BodyData[] = data
 
 // Readable scale: sqrt compresses the ~290x size range between the Sun and
 // Mercury. The Sun is capped so it doesn't swallow the inner orbits.
@@ -43,20 +30,25 @@ export function toSceneRadius(body: BodyData): number {
 // Scene structure per body:
 //   root (heliocentric position)
 //   ├─ pole (real pole orientation) ─ mesh (scaled sphere, spins) ─ rings
-//   └─ label (stays upright above the body)
+//   └─ label (stays upright above the body; click selects the body)
 export interface BodyView {
   data: BodyData
+  radius: number // scene units
   root: Group
   pole: Group
   mesh: Mesh
+  label: HTMLElement
 }
 
 const geometry = new SphereGeometry(1, 64, 32)
 
-function createLabel(text: string, height: number): CSS2DObject {
+function createLabel(body: BodyData, height: number): CSS2DObject {
   const el = document.createElement('div')
   el.className = 'label'
-  el.textContent = text
+  el.textContent = body.name
+  el.dataset.body = body.id
+  // The body list is the accessible way to select; labels are visual only.
+  el.setAttribute('aria-hidden', 'true')
   const label = new CSS2DObject(el)
   label.center.set(0.5, 1)
   label.position.y = height
@@ -86,14 +78,22 @@ export function createBodies(scene: Scene, date: Date): Map<string, BodyView> {
     pole.add(mesh)
 
     const root = new Group()
-    root.add(pole, createLabel(body.name, radius * 1.25 + 1.5))
+    const label = createLabel(body, radius * 1.25 + 1.5)
+    root.add(pole, label)
     if (body.emissive) root.add(createSunGlow(radius * 7))
     scene.add(root)
 
     if (body.orbitalPeriodDays) {
       scene.add(createOrbitLine(body.id as Body, date, body.orbitalPeriodDays))
     }
-    views.set(body.id, { data: body, root, pole, mesh })
+    views.set(body.id, {
+      data: body,
+      radius,
+      root,
+      pole,
+      mesh,
+      label: label.element,
+    })
   }
   updateBodies(views, date)
   return views
