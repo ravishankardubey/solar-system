@@ -32,6 +32,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Fixed
 
+- Time panel on phones: buttons were squeezed and icons pushed right because the shrink-to-fit panel at `left: 50%` was capped at half the screen. It now has a fixed width (≤ 320 px), centred with margins, and buttons don't shrink.
+- Date readout no longer resizes the panel or flickers at speed: fixed-width panel, detail drops with speed (seconds ≤ 1 min/s, minutes ≤ 1 day/s, date only above), and the text updates at most 10×/s.
+- The readout was already device-local time; the speed line now names the time zone (e.g. "GMT+5:30") so that's clear.
 - Moon counts updated to current figures (Jupiter 115, Apr 2026; Saturn 293, Jun 2026) and shown with an as-of date, since they keep changing.
 - Time shortcuts stopped working while any button had focus; now only Space/Enter are left to a focused button.
 - M3 motion and time:

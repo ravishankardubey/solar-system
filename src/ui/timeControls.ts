@@ -91,28 +91,60 @@ export function mountTimeControls(
     update()
   })
 
-  const withSeconds = new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'medium',
+  // Device-local time. Detail drops as speed rises: seconds are unreadable
+  // at an hour per second, and the clock time at a week per second.
+  const dateParts = { day: '2-digit', month: 'short', year: 'numeric' } as const
+  const formats = [
+    new Intl.DateTimeFormat(undefined, {
+      ...dateParts,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }),
+    new Intl.DateTimeFormat(undefined, {
+      ...dateParts,
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+    new Intl.DateTimeFormat(undefined, dateParts),
+  ]
+  const formatFor = (speedIndex: number) =>
+    formats[speedIndex <= 1 ? 0 : speedIndex <= 3 ? 1 : 2]
+  const zoneFormat = new Intl.DateTimeFormat(undefined, {
+    timeZoneName: 'short',
   })
-  const withMinutes = new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
+  const zoneOf = (date: Date) =>
+    zoneFormat.formatToParts(date).find((p) => p.type === 'timeZoneName')
+      ?.value ?? ''
 
-  // Only touch the DOM when something visible changed.
-  let shown = ''
+  // Touch the DOM only when something visible changed, and the ticking date
+  // at most 10 times a second so it stays readable.
+  const DATE_INTERVAL_MS = 100
+  let shownState = ''
+  let shownDate = ''
+  let lastDateUpdate = 0
   function update(): void {
-    const format = clock.speedIndex <= 1 ? withSeconds : withMinutes
-    const dateText = format.format(clock.date)
     const speedText = `${clock.direction < 0 ? '−' : ''}${SPEEDS[clock.speedIndex].label}`
-    const key = `${dateText}|${speedText}|${clock.playing}`
-    if (key === shown) return
-    shown = key
+    const zone = zoneOf(clock.date)
+    const state = `${speedText}|${clock.playing}|${zone}`
+    const stateChanged = state !== shownState
+    const now = performance.now()
+    const dateText = formatFor(clock.speedIndex).format(clock.date)
+    if (
+      dateText !== shownDate &&
+      (stateChanged || now - lastDateUpdate >= DATE_INTERVAL_MS)
+    ) {
+      shownDate = dateText
+      lastDateUpdate = now
+      dateEl.textContent = dateText
+      dateEl.dateTime = clock.date.toISOString()
+    }
+    if (!stateChanged) return
+    shownState = state
 
-    dateEl.textContent = dateText
-    dateEl.dateTime = clock.date.toISOString()
-    speedEl.textContent = clock.playing ? speedText : `Paused · ${speedText}`
+    const speed = clock.playing ? speedText : `Paused · ${speedText}`
+    speedEl.textContent = zone ? `${speed} · ${zone}` : speed
+    speedEl.title = "Shown in this device's local time zone"
     playBtn.innerHTML = icon(clock.playing ? 'pause' : 'play')
     playBtn.setAttribute('aria-label', clock.playing ? 'Pause' : 'Play')
     reverseBtn.setAttribute('aria-pressed', String(clock.direction < 0))

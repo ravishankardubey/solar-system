@@ -58,10 +58,16 @@ body {
   --accent: #ffb74d;
   --hover: rgb(255 255 255 / 0.08);
 
+  /* Fixed width, centred with margins: a shrink-to-fit panel at left: 50%
+     is capped at half the screen on phones, squeezing the buttons, and it
+     resized every time the date text changed length. */
   position: fixed;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: calc(var(--credits-height, 16px) + 16px);
-  transform: translateX(-50%);
+  width: min(320px, calc(100vw - 24px));
+  margin-inline: auto;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -98,9 +104,11 @@ body {
 .time-buttons {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
 
   button {
+    flex: none;
     display: grid;
     place-items: center;
     width: 36px;
@@ -601,6 +609,7 @@ body.in-ar {
   transform: translateX(-50%);
   display: flex;
   gap: 8px;
+  width: max-content;
   white-space: nowrap;
 
   &[hidden] {
