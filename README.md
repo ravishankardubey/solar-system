@@ -2,6 +2,8 @@
 
 An interactive, browser-based 3D explorer of the Sun, planets, and major moons. Static site, no backend: all rendering and orbital math run in the browser.
 
+Live: https://ravishankardubey.github.io/solar-system/
+
 Built with [Three.js](https://threejs.org/), [astronomy-engine](https://github.com/cosinekitty/astronomy), Vite, and TypeScript.
 
 ## Development

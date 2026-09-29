@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
 
+# One deploy at a time; a newer push replaces a queued one.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,8 +22,22 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
       - run: npm run typecheck
-      - run: npm run build
-      - uses: actions/upload-artifact@v4
+      # Project page is served from /<repo>/, so assets need that base path.
+      - run: npm run build -- --base=/${{ github.event.repository.name }}/
+      - uses: actions/upload-pages-artifact@v3
         with:
-          name: dist
           path: dist
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

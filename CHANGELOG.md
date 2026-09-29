@@ -7,6 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Added
 
+- GitHub Pages deployment: pushes to `master` build with base `/solar-system/` and deploy to https://ravishankardubey.github.io/solar-system/.
 - Visual polish (pulled forward from MVP/v1 because the bare scene looked primitive):
   - Sky (`src/sky`): seeded procedural starfield (3 layers, soft round points, tinted) that follows the camera, over a faint Milky Way panorama (Solar System Scope, 250 KB).
   - Sun corona: additive camera-facing glow sprite.
@@ -45,4 +46,4 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 - UI: plain TypeScript + CSS (no Angular for now).
 - Scale: real positions from `astronomy-engine` with a readable (compressed) default scale.
-- Hosting: deferred; CI builds only, no deploy step yet.
+- Hosting: GitHub Pages (decided 2026-09-30).

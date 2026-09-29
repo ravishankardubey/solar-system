@@ -38,7 +38,7 @@ Modules stay small and independent. UI talks only to `clock` and `camera`, never
 
 ## Milestone progress
 
-- [x] 1. Project setup (repo + CI live on GitHub; deploy pending hosting decision)
+- [x] 1. Project setup (repo, CI, GitHub Pages deploy)
 - [x] 2. Static scene
 - [ ] 3. Motion and time
 - [ ] 4. Interaction
@@ -49,6 +49,5 @@ Modules stay small and independent. UI talks only to `clock` and `camera`, never
 
 Not urgent. Do not start these unless the user asks.
 
-- [ ] Choose hosting (Cloudflare Pages or GitHub Pages) and add a deploy step to CI. The user will decide near the end of the project.
 - [ ] Custom domain or subdomain (for example under ravishankardubey.in).
 - [ ] Analytics: none, or a privacy-friendly option with no cookie banner.
