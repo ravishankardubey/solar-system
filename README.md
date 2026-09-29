@@ -25,7 +25,7 @@ npm run dev
 | `npm run format`    | Prettier (write)                |
 | `npm run typecheck` | TypeScript only                 |
 
-On phones that support it, an **AR** button shows the system on a table: live on Android Chrome (WebXR), as a snapshot in AR Quick Look on iPhone and iPad.
+On phones that support it, an **AR** button shows the system on a table: live on Android Chrome (WebXR), as a looping animation in AR Quick Look on iPhone and iPad.
 
 Asteroid data comes from the NASA/JPL Small-Body Database. To refresh it, run `node scripts/fetch-asteroids.mjs` and commit `public/data/`.
 

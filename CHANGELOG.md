@@ -9,8 +9,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 - AR view (`src/ar`), shown only on devices that support it:
   - Android (Chrome, ARCore): live WebXR AR. Point at a surface, tap to place; the system floats ~15 cm above it at ~1 m across. Time keeps running with the time panel over the camera view; Exit, Move and −/+ size buttons.
-  - iPhone/iPad: a USDZ snapshot of the current moment (planets, rings, emissive Sun, orbit tubes, 1,000 sampled asteroids; ~10.7 MB, ~2 s to build) opened in AR Quick Look with pinch-to-scale. Static: no motion, time controls or labels. The USDZ exporter is loaded only on iOS.
-  - Checked: USDZ passes Pixar `UsdValidation` (usdz package validators) with 0 errors, measures 1.09 × 0.27 × 1.07 m, and round-trips through three's USDZ loader. WebXR has not been tested on a device yet.
+  - iPhone/iPad: a USDZ of the current moment (planets, rings, emissive Sun, orbit tubes, 1,000 sampled asteroids; ~10.9 MB, ~2 s to build) opened in AR Quick Look with pinch-to-scale. It plays a seamless 60 s loop covering one Jupiter year: Mercury 49, Venus 19, Earth 12, Mars 6, Ceres/Vesta 3 and Jupiter 1 real orbits (speeds nudged a few percent, Ceres ~16%, so the loop closes); the belt turns 3× and the Trojans 1× as rigid groups; Saturn, Uranus and Neptune stay still. No time controls or labels. The USDZ exporter is loaded only on iOS.
+  - Checked: USDZ passes Pixar `UsdValidation` with 0 errors, measures 1.09 × 0.27 × 1.07 m, round-trips through three's USDZ loader, and its animation evaluates to exact whole turns with zero seam gap. Both AR paths confirmed working on real phones.
 - Asteroid belt (pulled forward from "Later"):
   - 24,504 real asteroids brighter than H 14 from the NASA/JPL Small-Body Database: inner/main/outer belt (20k) plus Jupiter Trojans (4.5k, tinted blue).
   - Each follows its own Kepler orbit solved on the GPU from the sim date (one draw call); brighter asteroids draw larger. Data loads in the background after first render.

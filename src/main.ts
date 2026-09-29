@@ -152,7 +152,16 @@ async function enterAr(mode: ArMode): Promise<void> {
   if (mode === 'quicklook') {
     // Loaded on demand: only iOS needs the USDZ exporter.
     const { openQuickLook, ASTEROID_COUNT } = await import('./ar/quicklook.ts')
-    await openQuickLook(system, asteroids?.sample(clock.date, ASTEROID_COUNT))
+    await openQuickLook({
+      system,
+      bodies: [...views.values()].map((v) => ({
+        root: v.root,
+        position: v.position,
+        periodDays: v.data.orbitalPeriodDays,
+      })),
+      asteroids: asteroids?.sample(clock.date, ASTEROID_COUNT),
+      date: clock.date,
+    })
     return
   }
   select(null)
@@ -177,20 +186,16 @@ async function enterAr(mode: ArMode): Promise<void> {
 
 detectArMode().then((mode) => {
   if (!mode) return
-  const button = mountArButton(
-    document.body,
-    mode === 'webxr' ? 'View in AR' : 'View in AR (snapshot)',
-    async () => {
-      button.setBusy(true)
-      try {
-        await enterAr(mode)
-      } catch (err) {
-        console.warn('AR failed', err)
-      } finally {
-        button.setBusy(false)
-      }
-    },
-  )
+  const button = mountArButton(document.body, 'View in AR', async () => {
+    button.setBusy(true)
+    try {
+      await enterAr(mode)
+    } catch (err) {
+      console.warn('AR failed', err)
+    } finally {
+      button.setBusy(false)
+    }
+  })
 })
 
 labelRenderer.domElement.addEventListener('click', (e) => {
