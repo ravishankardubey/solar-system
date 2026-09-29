@@ -32,6 +32,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Fixed
 
+- AR (Android): time-panel buttons were restyled as AR pills (border, 42 px) because the overlay's button rule reached the panel moved into it; AR styles now apply only to the AR controls.
+- AR (Android): 3D labels were invisible: sprites without size attenuation still multiply by parent scale, and AR shrinks the system ~1/500. Labels now divide out the system scale every frame (`fitArLabels`).
 - Time panel on phones: buttons were squeezed and icons pushed right because the shrink-to-fit panel at `left: 50%` was capped at half the screen. It now has a fixed width (≤ 320 px), centred with margins, and buttons don't shrink.
 - Date readout no longer resizes the panel or flickers at speed: fixed-width panel, detail drops with speed (seconds ≤ 1 min/s, minutes ≤ 1 day/s, date only above), and the text updates at most 10×/s.
 - The readout was already device-local time; the speed line now names the time zone (e.g. "GMT+5:30") so that's clear.

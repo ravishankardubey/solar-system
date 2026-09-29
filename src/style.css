@@ -557,7 +557,10 @@ body.in-ar {
   color: #e8eaed;
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
 
-  button {
+  /* Only the AR controls: the time and info panels moved into the overlay
+     keep their own button styles. */
+  .ar-top button,
+  .ar-actions button {
     height: 42px;
     padding: 0 16px;
     border: 1px solid rgb(255 255 255 / 0.15);
@@ -616,7 +619,7 @@ body.in-ar {
     display: none;
   }
 
-  [aria-pressed='true'] {
+  button[aria-pressed='true'] {
     border-color: #ffb74d;
     color: #ffb74d;
   }

@@ -19,6 +19,7 @@ import {
   AR_LABEL_ACTIVE_COLOR,
   AR_LABEL_COLOR,
   createBodies,
+  fitArLabels,
   updateBodies,
 } from './bodies/index.ts'
 import {
@@ -264,6 +265,7 @@ function frame(time: number, xrFrame?: XRFrame): void {
   const inAr = renderer.xr.isPresenting
   if (inAr) {
     if (xrFrame) xrSession?.update(xrFrame)
+    fitArLabels(views, system.scale.x)
   } else {
     cameraController.update(dt)
     applyInset(dt)

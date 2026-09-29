@@ -8,6 +8,7 @@ import {
   SphereGeometry,
   Sprite,
   SpriteMaterial,
+  type Vector3,
   type Object3D,
 } from 'three'
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
@@ -96,6 +97,7 @@ function createArLabel(body: BodyData, height: number): Sprite {
   )
   sprite.center.set(0.5, 0)
   sprite.scale.set(size * aspect, size, 1)
+  sprite.userData.baseScale = sprite.scale.clone()
   sprite.position.y = height
   sprite.renderOrder = 10
   sprite.visible = false
@@ -169,6 +171,20 @@ export function createBodies(
   }
   updateBodies(views, date)
   return views
+}
+
+// Sprites with sizeAttenuation off still multiply by their parents' scale,
+// and AR shrinks the whole system (~1/500). Undo that so labels keep their
+// on-screen size at any AR scale.
+export function fitArLabels(
+  views: Map<string, BodyView>,
+  systemScale: number,
+): void {
+  for (const { arLabel } of views.values()) {
+    arLabel.scale
+      .copy(arLabel.userData.baseScale as Vector3)
+      .divideScalar(systemScale)
+  }
 }
 
 // Move every body to where it is at `date` and spin it to its real rotation.
