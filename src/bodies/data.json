@@ -1,0 +1,79 @@
+[
+  {
+    "id": "Sun",
+    "name": "Sun",
+    "radiusKm": 695700,
+    "axialTiltDeg": 7.25,
+    "texture": "sun.jpg",
+    "emissive": true
+  },
+  {
+    "id": "Mercury",
+    "name": "Mercury",
+    "radiusKm": 2439.7,
+    "axialTiltDeg": 0.03,
+    "orbitalPeriodDays": 87.969,
+    "texture": "mercury.jpg"
+  },
+  {
+    "id": "Venus",
+    "name": "Venus",
+    "radiusKm": 6051.8,
+    "axialTiltDeg": 177.4,
+    "orbitalPeriodDays": 224.701,
+    "texture": "venus.jpg"
+  },
+  {
+    "id": "Earth",
+    "name": "Earth",
+    "radiusKm": 6371,
+    "axialTiltDeg": 23.44,
+    "orbitalPeriodDays": 365.256,
+    "texture": "earth.jpg"
+  },
+  {
+    "id": "Mars",
+    "name": "Mars",
+    "radiusKm": 3389.5,
+    "axialTiltDeg": 25.19,
+    "orbitalPeriodDays": 686.98,
+    "texture": "mars.jpg"
+  },
+  {
+    "id": "Jupiter",
+    "name": "Jupiter",
+    "radiusKm": 69911,
+    "axialTiltDeg": 3.13,
+    "orbitalPeriodDays": 4332.59,
+    "texture": "jupiter.jpg"
+  },
+  {
+    "id": "Saturn",
+    "name": "Saturn",
+    "radiusKm": 58232,
+    "axialTiltDeg": 26.73,
+    "orbitalPeriodDays": 10759.22,
+    "texture": "saturn.jpg",
+    "rings": {
+      "innerKm": 74658,
+      "outerKm": 136775,
+      "texture": "saturn_ring.png"
+    }
+  },
+  {
+    "id": "Uranus",
+    "name": "Uranus",
+    "radiusKm": 25362,
+    "axialTiltDeg": 97.77,
+    "orbitalPeriodDays": 30688.5,
+    "texture": "uranus.jpg"
+  },
+  {
+    "id": "Neptune",
+    "name": "Neptune",
+    "radiusKm": 24622,
+    "axialTiltDeg": 28.32,
+    "orbitalPeriodDays": 60195,
+    "texture": "neptune.jpg"
+  }
+]
