@@ -2,6 +2,7 @@ import './style.css'
 import {
   ACESFilmicToneMapping,
   AmbientLight,
+  Group,
   MathUtils,
   PerspectiveCamera,
   PointLight,
@@ -10,6 +11,8 @@ import {
   WebGLRenderer,
 } from 'three'
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js'
+import { detectArMode, type ArMode } from './ar/index.ts'
+import { startWebXr, type WebXrSession } from './ar/webxr.ts'
 import { loadAsteroids, type AsteroidField } from './asteroids/index.ts'
 import { setMaxAnisotropy } from './assets/index.ts'
 import { createBodies, updateBodies } from './bodies/index.ts'
@@ -20,6 +23,7 @@ import {
 } from './camera/index.ts'
 import { SimClock } from './clock/index.ts'
 import { createSky } from './sky/index.ts'
+import { mountArButton } from './ui/arButton.ts'
 import { mountBodyList } from './ui/bodyList.ts'
 import { mountCredits } from './ui/credits.ts'
 import { mountInfoPanel } from './ui/infoPanel.ts'
@@ -32,7 +36,9 @@ const FOV = 45
 const MIN_ASPECT_FOR_FIXED_FOV = 1.6
 
 const canvas = document.querySelector<HTMLCanvasElement>('#scene')!
-const renderer = new WebGLRenderer({ canvas, antialias: true })
+// alpha lets the camera feed show through in AR.
+const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
+renderer.xr.enabled = true
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO))
 renderer.toneMapping = ACESFilmicToneMapping
 setMaxAnisotropy(renderer.capabilities.getMaxAnisotropy())
@@ -54,15 +60,22 @@ const clock = new SimClock()
 clock.playing = !reducedMotion
 const timer = new Timer()
 
+// Everything that belongs to the solar system lives in one group, so AR can
+// scale it to tabletop size and place it on a surface. The sky stays outside.
+const system = new Group()
+system.name = 'Solar system'
+scene.add(system)
+
 // Sunlight doesn't fall off with distance at this compressed scale; a faint
 // ambient keeps night sides from going fully black.
-scene.add(new PointLight(0xfff5e8, 3.2, 0, 0))
-scene.add(new AmbientLight(0xffffff, 0.06))
+system.add(new PointLight(0xfff5e8, 3.2, 0, 0))
+system.add(new AmbientLight(0xffffff, 0.06))
 
 const stars = createSky(scene)
-const views = createBodies(scene, clock.date)
+const skyBackground = scene.background
+const views = createBodies(system, clock.date)
 let asteroids: AsteroidField | undefined
-loadAsteroids(scene, renderer.getPixelRatio())
+loadAsteroids(system, renderer.getPixelRatio())
   .then((field) => (asteroids = field))
   .catch((err) => console.warn('Asteroid data failed to load', err))
 const cameraController = new CameraController(camera, canvas, reducedMotion)
@@ -124,6 +137,62 @@ onBodyClick(
   })),
   select,
 )
+// AR: live WebXR on Android, a Quick Look snapshot on iPhone/iPad.
+let xrSession: WebXrSession | undefined
+
+function setArView(on: boolean): void {
+  stars.visible = !on
+  scene.background = on ? null : skyBackground
+  labelRenderer.domElement.hidden = on
+  document.body.classList.toggle('in-ar', on)
+  if (!on) resize()
+}
+
+async function enterAr(mode: ArMode): Promise<void> {
+  if (mode === 'quicklook') {
+    // Loaded on demand: only iOS needs the USDZ exporter.
+    const { openQuickLook, ASTEROID_COUNT } = await import('./ar/quicklook.ts')
+    await openQuickLook(system, asteroids?.sample(clock.date, ASTEROID_COUNT))
+    return
+  }
+  select(null)
+  setArView(true)
+  try {
+    xrSession = await startWebXr({
+      renderer,
+      scene,
+      camera,
+      system,
+      timePanel: timeControls.element,
+      onEnd: () => {
+        xrSession = undefined
+        setArView(false)
+      },
+    })
+  } catch (err) {
+    console.warn('Could not start AR', err)
+    setArView(false)
+  }
+}
+
+detectArMode().then((mode) => {
+  if (!mode) return
+  const button = mountArButton(
+    document.body,
+    mode === 'webxr' ? 'View in AR' : 'View in AR (snapshot)',
+    async () => {
+      button.setBusy(true)
+      try {
+        await enterAr(mode)
+      } catch (err) {
+        console.warn('AR failed', err)
+      } finally {
+        button.setBusy(false)
+      }
+    },
+  )
+})
+
 labelRenderer.domElement.addEventListener('click', (e) => {
   const label = (e.target as HTMLElement).closest<HTMLElement>('[data-body]')
   if (label) select(label.dataset.body!)
@@ -151,20 +220,25 @@ function resize(): void {
 window.addEventListener('resize', resize)
 resize()
 
-function frame(time: number): void {
+function frame(time: number, xrFrame?: XRFrame): void {
   timer.update(time)
   const dt = timer.getDelta()
   clock.tick(dt)
   updateBodies(views, clock.date)
   asteroids?.update(clock.date)
   timeControls.update()
-  cameraController.update(dt)
-  applyInset(dt)
-  // Stars sit at "infinity": keep them centred on the camera so zooming
-  // never reaches them.
-  stars.position.copy(camera.position)
+  const inAr = renderer.xr.isPresenting
+  if (inAr) {
+    if (xrFrame) xrSession?.update(xrFrame)
+  } else {
+    cameraController.update(dt)
+    applyInset(dt)
+    // Stars sit at "infinity": keep them centred on the camera so zooming
+    // never reaches them.
+    stars.position.copy(camera.position)
+  }
   renderer.render(scene, camera)
-  labelRenderer.render(scene, camera)
+  if (!inAr) labelRenderer.render(scene, camera)
 }
 
 // Stop the loop entirely while the tab is hidden, per the perf budget.

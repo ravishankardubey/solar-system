@@ -5,9 +5,14 @@ import {
   Points,
   ShaderMaterial,
   Vector3,
-  type Scene,
+  type Object3D,
 } from 'three'
-import { julianDay, meanMotion, orbitAxes } from '../orbits/kepler.ts'
+import {
+  eccentricAnomaly,
+  julianDay,
+  meanMotion,
+  orbitAxes,
+} from '../orbits/kepler.ts'
 import { DISTANCE_FACTOR, DISTANCE_OFFSET } from '../orbits/index.ts'
 
 // Header written by scripts/fetch-asteroids.mjs next to asteroids.bin.
@@ -74,8 +79,17 @@ const fragmentShader = /* glsl */ `
   }
 `
 
+export interface AsteroidSample {
+  positions: Float32Array // scene units, xyz per asteroid
+  groups: Uint8Array // index into header.groups
+  groupNames: string[]
+}
+
 export interface AsteroidField {
   update(date: Date): void
+  // Every nth asteroid's position at `date`, computed on the CPU with the
+  // same math as the shader (for exports that can't run it, e.g. USDZ).
+  sample(date: Date, maxCount: number): AsteroidSample
 }
 
 function decode(header: AsteroidHeader, buffer: ArrayBuffer): BufferGeometry {
@@ -136,7 +150,7 @@ function decode(header: AsteroidHeader, buffer: ArrayBuffer): BufferGeometry {
 // Loads the packed JPL data in the background; the scene renders without it
 // until it arrives.
 export async function loadAsteroids(
-  scene: Scene,
+  parent: Object3D,
   pixelRatio: number,
 ): Promise<AsteroidField> {
   const base = `${import.meta.env.BASE_URL}data/asteroids`
@@ -157,14 +171,45 @@ export async function loadAsteroids(
     transparent: true,
     depthWrite: false,
   })
-  const points = new Points(decode(header, buffer), material)
+  const geometry = decode(header, buffer)
+  const points = new Points(geometry, material)
   points.name = 'Asteroids'
   points.frustumCulled = false // positions only exist on the GPU
-  scene.add(points)
+  parent.add(points)
+
+  const orbit = geometry.getAttribute('orbit').array as Float32Array
+  const axisP = geometry.getAttribute('axisP').array as Float32Array
+  const axisQ = geometry.getAttribute('axisQ').array as Float32Array
+  const allGroups = new Uint8Array(
+    buffer,
+    COLUMNS.length * header.count * 2 + header.count,
+    header.count,
+  )
 
   return {
     update(date) {
       material.uniforms.uDays.value = julianDay(date) - header.epochJd
+    },
+    sample(date, maxCount) {
+      const step = Math.max(1, Math.ceil(header.count / maxCount))
+      const count = Math.ceil(header.count / step)
+      const positions = new Float32Array(count * 3)
+      const groups = new Uint8Array(count)
+      const days = julianDay(date) - header.epochJd
+      const p = new Vector3()
+      const q = new Vector3()
+      for (let k = 0, idx = 0; idx < header.count; k++, idx += step) {
+        const [a, e, n, m0] = orbit.subarray(idx * 4, idx * 4 + 4)
+        const E = eccentricAnomaly(m0 + n * days, e)
+        p.fromArray(axisP, idx * 3).multiplyScalar(a * (Math.cos(E) - e))
+        q.fromArray(axisQ, idx * 3)
+        p.addScaledVector(q, a * Math.sqrt(1 - e * e) * Math.sin(E))
+        const r = p.length()
+        p.setLength(DISTANCE_OFFSET + DISTANCE_FACTOR * Math.sqrt(r))
+        p.toArray(positions, k * 3)
+        groups[k] = allGroups[idx]
+      }
+      return { positions, groups, groupNames: header.groups }
     },
   }
 }

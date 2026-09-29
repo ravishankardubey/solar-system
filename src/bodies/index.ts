@@ -6,7 +6,7 @@ import {
   MeshBasicMaterial,
   MeshStandardMaterial,
   SphereGeometry,
-  type Scene,
+  type Object3D,
 } from 'three'
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
 import { loadTexture } from '../assets/index.ts'
@@ -84,7 +84,10 @@ function createLabel(body: BodyData, height: number): CSS2DObject {
   return label
 }
 
-export function createBodies(scene: Scene, date: Date): Map<string, BodyView> {
+export function createBodies(
+  parent: Object3D,
+  date: Date,
+): Map<string, BodyView> {
   const views = new Map<string, BodyView>()
   for (const body of BODIES) {
     const radius = toSceneRadius(body)
@@ -110,11 +113,11 @@ export function createBodies(scene: Scene, date: Date): Map<string, BodyView> {
     const label = createLabel(body, radius * 1.25 + 1.5)
     root.add(pole, label)
     if (body.emissive) root.add(createSunGlow(radius * 7))
-    scene.add(root)
+    parent.add(root)
 
     const position = positionOf(body)
     if (body.orbitalPeriodDays) {
-      scene.add(
+      parent.add(
         createOrbitLine(position, date, body.orbitalPeriodDays, body.name),
       )
     }

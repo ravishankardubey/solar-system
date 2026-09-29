@@ -38,6 +38,7 @@ Modules stay small and independent. UI talks only to `clock` and `camera`, never
 | `assets/`    | M2        | `loadTexture(name)` from the 1K set; 2K streaming and KTX2 in M5                                                                                                                   |
 | `sky/`       | M2        | `createSky`: Milky Way background + seeded starfield (caller keeps it centred on the camera)                                                                                       |
 | `asteroids/` | done      | `loadAsteroids`: fetch packed data, GPU Kepler shader `Points`; `update(date)` sets days since epoch                                                                               |
+| `ar/`        | new       | `detectArMode` (webxr / quicklook), `webxr.ts` live AR session (hit-test, DOM overlay, place/move/scale), `quicklook.ts` USDZ snapshot export (lazy-loaded)                        |
 
 ## Milestone progress
 
@@ -52,6 +53,7 @@ Modules stay small and independent. UI talks only to `clock` and `camera`, never
 ## Next up
 
 - Major moons (~20): Moon + Galilean via astronomy-engine, others from JPL mean elements; own compressed distance scale; fade in near their planet; textures from Solar System Scope (Moon) and NASA/USGS maps. See the moons feasibility notes in the 2026-09-30 session.
+- Test AR on real devices: Android Chrome (WebXR) and iPhone Safari (Quick Look). WebXR path is untested on hardware.
 - Labels clutter on phones in the overview (consider the v1 labels toggle or hiding minor labels when zoomed out).
 
 ## Deferred tasks

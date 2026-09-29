@@ -23,6 +23,7 @@ const SHORTCUTS: Record<string, (clock: SimClock) => void> = {
 }
 
 export interface TimeControls {
+  readonly element: HTMLElement
   update(): void
 }
 
@@ -119,5 +120,5 @@ export function mountTimeControls(
     fasterBtn.disabled = clock.speedIndex === SPEEDS.length - 1
   }
   update()
-  return { update }
+  return { element: panel, update }
 }

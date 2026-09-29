@@ -483,3 +483,121 @@ body {
     max-height: 36dvh;
   }
 }
+
+/* AR entry button: top bar beside the menu on phones, bottom-right otherwise. */
+.ar-button {
+  position: fixed;
+  right: 16px;
+  bottom: calc(var(--credits-height, 16px) + 16px);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 14px 0 12px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 21px;
+  background: rgb(14 16 22 / 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #e8eaed;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #ffb74d;
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+  }
+  &:focus-visible {
+    outline: 2px solid #ffb74d;
+    outline-offset: 2px;
+  }
+  &:disabled {
+    opacity: 0.7;
+    cursor: progress;
+  }
+}
+
+@media (max-width: 640px) {
+  .ar-button {
+    top: 12px;
+    right: 64px;
+    bottom: auto;
+  }
+}
+
+/* While in AR only the overlay (and the time panel moved into it) shows. */
+body.in-ar {
+  background: transparent;
+
+  .body-nav,
+  .info-panel,
+  .credits,
+  .ar-button {
+    display: none;
+  }
+}
+
+.ar-overlay {
+  position: fixed;
+  inset: 0;
+  color: #e8eaed;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  button {
+    height: 42px;
+    padding: 0 16px;
+    border: 1px solid rgb(255 255 255 / 0.15);
+    border-radius: 21px;
+    background: rgb(14 16 22 / 0.72);
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+.ar-top {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ar-scale {
+  display: flex;
+  gap: 8px;
+
+  button {
+    width: 42px;
+    padding: 0;
+    font-size: 20px;
+  }
+}
+
+.ar-hint {
+  position: absolute;
+  top: 40%;
+  left: 24px;
+  right: 24px;
+  margin: 0;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  text-shadow: 0 1px 6px rgb(0 0 0 / 0.9);
+}
+
+.ar-move {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+}

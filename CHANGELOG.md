@@ -7,6 +7,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Added
 
+- AR view (`src/ar`), shown only on devices that support it:
+  - Android (Chrome, ARCore): live WebXR AR. Point at a surface, tap to place; the system floats ~15 cm above it at ~1 m across. Time keeps running with the time panel over the camera view; Exit, Move and −/+ size buttons.
+  - iPhone/iPad: a USDZ snapshot of the current moment (planets, rings, emissive Sun, orbit tubes, 1,000 sampled asteroids; ~10.7 MB, ~2 s to build) opened in AR Quick Look with pinch-to-scale. Static: no motion, time controls or labels. The USDZ exporter is loaded only on iOS.
+  - Checked: USDZ passes Pixar `UsdValidation` (usdz package validators) with 0 errors, measures 1.09 × 0.27 × 1.07 m, and round-trips through three's USDZ loader. WebXR has not been tested on a device yet.
 - Asteroid belt (pulled forward from "Later"):
   - 24,504 real asteroids brighter than H 14 from the NASA/JPL Small-Body Database: inner/main/outer belt (20k) plus Jupiter Trojans (4.5k, tinted blue).
   - Each follows its own Kepler orbit solved on the GPU from the sim date (one draw call); brighter asteroids draw larger. Data loads in the background after first render.
@@ -45,6 +49,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Changed
 
+- Solar-system content now lives in one `system` group (bodies, orbits, asteroids, lights) so AR can scale and place it; the sky stays in the scene. Renderer uses `alpha: true` and `xr.enabled`.
 - Phone layout: "Solar System" title top-left, menu button top-right opening the body list (planets, Ceres, Vesta) with the credits inside; footer credits hidden on phones. Menu closes on selection, outside tap, or Esc.
 - Bodies get a position function (`planetPosition` via astronomy-engine, or `elementsPosition` from Kepler elements) and an orientation function (`iauOrientation` or `elementsOrientation` from IAU constants).
 - Number-key shortcuts come from `shortcut` in `data.json` (0–8 stay Sun…Neptune).
