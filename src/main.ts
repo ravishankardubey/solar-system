@@ -10,6 +10,7 @@ import {
   WebGLRenderer,
 } from 'three'
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js'
+import { loadAsteroids, type AsteroidField } from './asteroids/index.ts'
 import { setMaxAnisotropy } from './assets/index.ts'
 import { createBodies, updateBodies } from './bodies/index.ts'
 import {
@@ -60,6 +61,10 @@ scene.add(new AmbientLight(0xffffff, 0.06))
 
 const stars = createSky(scene)
 const views = createBodies(scene, clock.date)
+let asteroids: AsteroidField | undefined
+loadAsteroids(scene, renderer.getPixelRatio())
+  .then((field) => (asteroids = field))
+  .catch((err) => console.warn('Asteroid data failed to load', err))
 const cameraController = new CameraController(camera, canvas, reducedMotion)
 
 // Selection drives the camera, info panel, list and labels together.
@@ -151,6 +156,7 @@ function frame(time: number): void {
   const dt = timer.getDelta()
   clock.tick(dt)
   updateBodies(views, clock.date)
+  asteroids?.update(clock.date)
   timeControls.update()
   cameraController.update(dt)
   applyInset(dt)

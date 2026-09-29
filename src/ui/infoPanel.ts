@@ -17,7 +17,11 @@ function formatYear(days: number): string {
 
 function formatMass(earths: number): string {
   if (earths === 1) return '5.97 × 10²⁴ kg'
-  return `${num(earths < 1 ? 3 : 1).format(earths)} × Earth`
+  const format =
+    earths < 1
+      ? new Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 })
+      : num(1)
+  return `${format.format(earths)} × Earth`
 }
 
 function facts(body: BodyData): [string, string][] {
@@ -25,7 +29,10 @@ function facts(body: BodyData): [string, string][] {
   const rows: [string, string][] = [
     ['Radius', `${num(0).format(body.radiusKm)} km`],
     ['Mass', formatMass(body.massEarths)],
-    ['Surface gravity', `${num(1).format(body.gravity)} m/s²`],
+    [
+      'Surface gravity',
+      `${num(body.gravity < 1 ? 2 : 1).format(body.gravity)} m/s²`,
+    ],
     [
       isStar ? 'Rotation (equator)' : 'Length of day',
       formatDuration(body.dayHours),
@@ -38,11 +45,16 @@ function facts(body: BodyData): [string, string][] {
       'Distance from Sun',
       `${num(2).format(body.distanceAu)} AU · ${num(0).format(body.distanceAu * 149.6)} million km`,
     ])
-  rows.push([
-    isStar ? 'Surface temperature' : 'Mean temperature',
-    `${num(0).format(body.meanTempC)} °C`,
-  ])
-  if (body.moons !== undefined) rows.push(['Known moons', String(body.moons)])
+  if (body.meanTempC !== undefined)
+    rows.push([
+      isStar ? 'Surface temperature' : 'Mean temperature',
+      `${num(0).format(body.meanTempC)} °C`,
+    ])
+  if (body.moons !== undefined)
+    rows.push([
+      'Known moons',
+      body.moonsAsOf ? `${body.moons} (${body.moonsAsOf})` : String(body.moons),
+    ])
   if (!isStar) rows.push(['Axial tilt', `${num(1).format(body.axialTiltDeg)}°`])
   return rows
 }

@@ -25,4 +25,6 @@ npm run dev
 | `npm run format`    | Prettier (write)                |
 | `npm run typecheck` | TypeScript only                 |
 
+Asteroid data comes from the NASA/JPL Small-Body Database. To refresh it, run `node scripts/fetch-asteroids.mjs` and commit `public/data/`.
+
 See [BRIEF.md](BRIEF.md) for scope and roadmap, and [CHANGELOG.md](CHANGELOG.md) for history.

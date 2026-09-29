@@ -12,7 +12,8 @@
     "meanTempC": 5500,
     "axialTiltDeg": 7.25,
     "texture": "sun.jpg",
-    "emissive": true
+    "emissive": true,
+    "shortcut": 0
   },
   {
     "id": "Mercury",
@@ -29,7 +30,8 @@
     "meanTempC": 167,
     "moons": 0,
     "axialTiltDeg": 0.03,
-    "texture": "mercury.jpg"
+    "texture": "mercury.jpg",
+    "shortcut": 1
   },
   {
     "id": "Venus",
@@ -46,7 +48,8 @@
     "meanTempC": 464,
     "moons": 0,
     "axialTiltDeg": 177.4,
-    "texture": "venus.jpg"
+    "texture": "venus.jpg",
+    "shortcut": 2
   },
   {
     "id": "Earth",
@@ -63,7 +66,8 @@
     "meanTempC": 15,
     "moons": 1,
     "axialTiltDeg": 23.44,
-    "texture": "earth.jpg"
+    "texture": "earth.jpg",
+    "shortcut": 3
   },
   {
     "id": "Mars",
@@ -80,7 +84,73 @@
     "meanTempC": -65,
     "moons": 2,
     "axialTiltDeg": 25.19,
-    "texture": "mars.jpg"
+    "texture": "mars.jpg",
+    "shortcut": 4
+  },
+  {
+    "id": "Ceres",
+    "name": "Ceres",
+    "type": "Dwarf planet",
+    "color": "#b8b0a4",
+    "description": "The largest object in the asteroid belt and the only dwarf planet in the inner Solar System. NASA's Dawn spacecraft found bright salt deposits in Occator crater, left by briny water from below.",
+    "radiusKm": 469.7,
+    "massEarths": 0.000157,
+    "gravity": 0.28,
+    "dayHours": 9.07,
+    "orbitalPeriodDays": 1680,
+    "distanceAu": 2.77,
+    "meanTempC": -105,
+    "moons": 0,
+    "axialTiltDeg": 4,
+    "texture": "ceres.jpg",
+    "minor": true,
+    "orbit": {
+      "a": 2.765552595034094,
+      "e": 0.07969229514816586,
+      "iDeg": 10.58802780183462,
+      "nodeDeg": 80.24862682043221,
+      "periDeg": 73.29421453021587,
+      "meanAnomalyDeg": 274.4193463761342,
+      "epochJd": 2461200.5
+    },
+    "rotation": {
+      "poleRaDeg": 291.418,
+      "poleDecDeg": 66.764,
+      "w0Deg": 170.65,
+      "wRateDegPerDay": 952.1532
+    }
+  },
+  {
+    "id": "Vesta",
+    "name": "Vesta",
+    "type": "Asteroid",
+    "color": "#a3a3a3",
+    "description": "The second-largest asteroid and sometimes bright enough to see without a telescope. A giant impact carved its 500 km-wide Rheasilvia basin, whose central peak rises about 22 km.",
+    "radiusKm": 262.7,
+    "massEarths": 4.34e-5,
+    "gravity": 0.25,
+    "dayHours": 5.34,
+    "orbitalPeriodDays": 1325,
+    "distanceAu": 2.36,
+    "moons": 0,
+    "axialTiltDeg": 29,
+    "texture": "vesta.jpg",
+    "minor": true,
+    "orbit": {
+      "a": 2.361365965127599,
+      "e": 0.09020374382834395,
+      "iDeg": 7.143925545058711,
+      "nodeDeg": 103.701293265032,
+      "periDeg": 151.4686478221564,
+      "meanAnomalyDeg": 81.19015607686903,
+      "epochJd": 2461200.5
+    },
+    "rotation": {
+      "poleRaDeg": 309.031,
+      "poleDecDeg": 42.235,
+      "w0Deg": 285.39,
+      "wRateDegPerDay": 1617.3329428
+    }
   },
   {
     "id": "Jupiter",
@@ -95,9 +165,11 @@
     "orbitalPeriodDays": 4332.59,
     "distanceAu": 5.203,
     "meanTempC": -110,
-    "moons": 95,
+    "moons": 115,
+    "moonsAsOf": "Apr 2026",
     "axialTiltDeg": 3.13,
-    "texture": "jupiter.jpg"
+    "texture": "jupiter.jpg",
+    "shortcut": 5
   },
   {
     "id": "Saturn",
@@ -112,14 +184,16 @@
     "orbitalPeriodDays": 10759.22,
     "distanceAu": 9.537,
     "meanTempC": -140,
-    "moons": 274,
+    "moons": 293,
+    "moonsAsOf": "Jun 2026",
     "axialTiltDeg": 26.73,
     "texture": "saturn.jpg",
     "rings": {
       "innerKm": 74658,
       "outerKm": 136775,
       "texture": "saturn_ring.png"
-    }
+    },
+    "shortcut": 6
   },
   {
     "id": "Uranus",
@@ -135,8 +209,10 @@
     "distanceAu": 19.19,
     "meanTempC": -195,
     "moons": 29,
+    "moonsAsOf": "Aug 2025",
     "axialTiltDeg": 97.77,
-    "texture": "uranus.jpg"
+    "texture": "uranus.jpg",
+    "shortcut": 7
   },
   {
     "id": "Neptune",
@@ -152,7 +228,9 @@
     "distanceAu": 30.07,
     "meanTempC": -200,
     "moons": 16,
+    "moonsAsOf": "Feb 2024",
     "axialTiltDeg": 28.32,
-    "texture": "neptune.jpg"
+    "texture": "neptune.jpg",
+    "shortcut": 8
   }
 ]

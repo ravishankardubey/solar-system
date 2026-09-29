@@ -17,9 +17,9 @@ export function mountBodyList(
     <h1>Solar System</h1>
     <ul>
       ${BODIES.map(
-        (b, i) => `
+        (b) => `
         <li>
-          <button type="button" data-body="${b.id}" title="${b.name} (${i})" style="--body-color: ${b.color}">
+          <button type="button" data-body="${b.id}" title="${b.shortcut === undefined ? b.name : `${b.name} (${b.shortcut})`}" style="--body-color: ${b.color}"${b.minor ? ' class="minor"' : ''}>
             <span class="dot" aria-hidden="true"></span>${b.name}
           </button>
         </li>`,
@@ -37,8 +37,8 @@ export function mountBodyList(
   window.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return
     if ((e.target as Element).closest('input, textarea, select')) return
-    const body = BODIES[Number(e.key)]
-    if (/^\d$/.test(e.key) && body) onSelect(body.id)
+    const body = BODIES.find((b) => String(b.shortcut) === e.key)
+    if (body) onSelect(body.id)
   })
 
   const buttons = [...nav.querySelectorAll<HTMLButtonElement>('button')]

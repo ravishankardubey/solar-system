@@ -1,0 +1,17 @@
+{
+  "source": "NASA/JPL Small-Body Database (ssd-api.jpl.nasa.gov)",
+  "fetched": "2026-09-29",
+  "filter": "H < 14",
+  "count": 24504,
+  "epochJd": 2461200.5,
+  "frame": "heliocentric ecliptic J2000",
+  "ranges": {
+    "a": [1.5, 6],
+    "e": [0, 1],
+    "i": [0, 3.141592653589793],
+    "node": [0, 6.283185307179586],
+    "peri": [0, 6.283185307179586],
+    "meanAnomaly": [0, 6.283185307179586]
+  },
+  "groups": ["belt", "trojans"]
+}

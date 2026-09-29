@@ -1,6 +1,7 @@
 import type { Body } from 'astronomy-engine'
 import {
   Group,
+  MathUtils,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
@@ -10,9 +11,13 @@ import {
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
 import { loadTexture } from '../assets/index.ts'
 import {
-  bodyOrientation,
   createOrbitLine,
-  heliocentricPosition,
+  elementsOrientation,
+  elementsPosition,
+  iauOrientation,
+  planetPosition,
+  type OrientationFn,
+  type PositionFn,
 } from '../orbits/index.ts'
 import { BODIES, type BodyData } from './data.ts'
 import { createRings } from './rings.ts'
@@ -38,6 +43,29 @@ export interface BodyView {
   pole: Group
   mesh: Mesh
   label: HTMLElement
+  position: PositionFn
+  orientation: OrientationFn
+}
+
+function positionOf(body: BodyData): PositionFn {
+  const o = body.orbit
+  if (!o) return planetPosition(body.id as Body)
+  const rad = MathUtils.degToRad
+  return elementsPosition({
+    a: o.a,
+    e: o.e,
+    i: rad(o.iDeg),
+    node: rad(o.nodeDeg),
+    peri: rad(o.periDeg),
+    meanAnomaly: rad(o.meanAnomalyDeg),
+    epochJd: o.epochJd,
+  })
+}
+
+function orientationOf(body: BodyData): OrientationFn {
+  return body.rotation
+    ? elementsOrientation(body.rotation)
+    : iauOrientation(body.id as Body)
 }
 
 const geometry = new SphereGeometry(1, 64, 32)
@@ -47,6 +75,7 @@ function createLabel(body: BodyData, height: number): CSS2DObject {
   el.className = 'label'
   el.textContent = body.name
   el.dataset.body = body.id
+  if (body.minor) el.classList.add('minor')
   // The body list is the accessible way to select; labels are visual only.
   el.setAttribute('aria-hidden', 'true')
   const label = new CSS2DObject(el)
@@ -83,8 +112,11 @@ export function createBodies(scene: Scene, date: Date): Map<string, BodyView> {
     if (body.emissive) root.add(createSunGlow(radius * 7))
     scene.add(root)
 
+    const position = positionOf(body)
     if (body.orbitalPeriodDays) {
-      scene.add(createOrbitLine(body.id as Body, date, body.orbitalPeriodDays))
+      scene.add(
+        createOrbitLine(position, date, body.orbitalPeriodDays, body.name),
+      )
     }
     views.set(body.id, {
       data: body,
@@ -93,6 +125,8 @@ export function createBodies(scene: Scene, date: Date): Map<string, BodyView> {
       pole,
       mesh,
       label: label.element,
+      position,
+      orientation: orientationOf(body),
     })
   }
   updateBodies(views, date)
@@ -101,9 +135,8 @@ export function createBodies(scene: Scene, date: Date): Map<string, BodyView> {
 
 // Move every body to where it is at `date` and spin it to its real rotation.
 export function updateBodies(views: Map<string, BodyView>, date: Date): void {
-  for (const { data, root, pole, mesh } of views.values()) {
-    const body = data.id as Body
-    heliocentricPosition(body, date, root.position)
-    mesh.rotation.y = bodyOrientation(body, date, pole.quaternion)
+  for (const { root, pole, mesh, position, orientation } of views.values()) {
+    position(date, root.position)
+    mesh.rotation.y = orientation(date, pole.quaternion)
   }
 }

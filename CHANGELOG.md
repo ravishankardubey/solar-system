@@ -7,6 +7,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Added
 
+- Asteroid belt (pulled forward from "Later"):
+  - 24,504 real asteroids brighter than H 14 from the NASA/JPL Small-Body Database: inner/main/outer belt (20k) plus Jupiter Trojans (4.5k, tinted blue).
+  - Each follows its own Kepler orbit solved on the GPU from the sim date (one draw call); brighter asteroids draw larger. Data loads in the background after first render.
+  - `scripts/fetch-asteroids.mjs` fetches and packs the data into `public/data/asteroids.bin` (343 KB, 16-bit quantized) + `asteroids.json`; run by hand to refresh, output is committed.
+  - Ceres (dwarf planet) and Vesta as selectable bodies with facts, Dawn global maps (NASA/JPL-Caltech/UCLA/MPS/DLR/IDA via USGS), SBDB orbital elements and IAU rotation constants. Kepler position checked against JPL Horizons for Ceres: agrees within ~5×10⁻⁵ AU.
+  - `src/orbits/kepler.ts`: shared Kepler math (CPU for named bodies, mirrored in the asteroid shader).
+- Credits line now also credits Dawn imagery and JPL SBDB; bottom panel sits above it when it wraps.
 - M4 interaction:
   - Click a planet (screen-space hit test, min 16 px target so small planets are easy to hit) or its label to select it; drags don't select.
   - Camera flies to the selected body over 1.4 s (ease in-out), viewing it 40° off the Sun line so the terminator shows, then follows it as it moves while orbit/zoom still work. Reduced motion skips the flight.
@@ -17,6 +24,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Fixed
 
+- Moon counts updated to current figures (Jupiter 115, Apr 2026; Saturn 293, Jun 2026) and shown with an as-of date, since they keep changing.
 - Time shortcuts stopped working while any button had focus; now only Space/Enter are left to a focused button.
 - M3 motion and time:
   - Planets move every frame to their `astronomy-engine` positions for the sim date.
@@ -37,6 +45,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Changed
 
+- Bodies get a position function (`planetPosition` via astronomy-engine, or `elementsPosition` from Kepler elements) and an orientation function (`iauOrientation` or `elementsOrientation` from IAU constants).
+- Number-key shortcuts come from `shortcut` in `data.json` (0–8 stay Sun…Neptune).
 - Body orientation no longer uses `axialTiltDeg` (kept as a display fact); the tilt group is now a pole group driven by the rotation model.
 - Each body is now a group: position root → axial-tilt group → mesh (+ rings), with an upright label beside the tilt group.
 - M2 static scene: Sun and 8 planets at their real heliocentric positions for the current date (`astronomy-engine`), ecliptic plane as the scene's XZ plane.
