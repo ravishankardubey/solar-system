@@ -7,6 +7,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Added
 
+- M3 motion and time:
+  - Planets move every frame to their `astronomy-engine` positions for the sim date.
+  - Real body orientation from the IAU rotation model (`RotationAxis`): true pole direction and prime-meridian spin, so day/night sides and Saturn's ring angle match the date. Checked: sub-solar point on Earth lands within ~1° of the expected longitude/latitude at equinox, solstices, and an arbitrary date.
+  - `SimClock` speed presets (real time → 1 year/s), reverse, play/pause, jump to now.
+  - Time panel (`src/ui/timeControls.ts`): date/time readout, speed, reverse, slower, play/pause, faster, Now.
+  - Keyboard: Space play/pause, `[` slower, `]` faster, `R` reverse, `N` now.
+  - `prefers-reduced-motion` starts the clock paused.
 - GitHub Pages deployment: pushes to `master` build with base `/solar-system/` and deploy to https://ravishankardubey.github.io/solar-system/.
 - Visual polish (pulled forward from MVP/v1 because the bare scene looked primitive):
   - Sky (`src/sky`): seeded procedural starfield (3 layers, soft round points, tinted) that follows the camera, over a faint Milky Way panorama (Solar System Scope, 250 KB).
@@ -19,6 +26,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version
 
 ### Changed
 
+- Body orientation no longer uses `axialTiltDeg` (kept as a display fact); the tilt group is now a pole group driven by the rotation model.
 - Each body is now a group: position root → axial-tilt group → mesh (+ rings), with an upright label beside the tilt group.
 - M2 static scene: Sun and 8 planets at their real heliocentric positions for the current date (`astronomy-engine`), ecliptic plane as the scene's XZ plane.
 - Readable scale: distances `20 + 45·√AU`, radii `0.04·√km`, Sun fixed at 16 units (`src/orbits`, `src/bodies`).

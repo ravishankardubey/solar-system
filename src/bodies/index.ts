@@ -1,7 +1,6 @@
 import type { Body } from 'astronomy-engine'
 import {
   Group,
-  MathUtils,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
@@ -10,7 +9,11 @@ import {
 } from 'three'
 import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
 import { loadTexture } from '../assets/index.ts'
-import { createOrbitLine, heliocentricPosition } from '../orbits/index.ts'
+import {
+  bodyOrientation,
+  createOrbitLine,
+  heliocentricPosition,
+} from '../orbits/index.ts'
 import data from './data.json'
 import { createRings } from './rings.ts'
 import { createSunGlow } from './sunGlow.ts'
@@ -39,11 +42,12 @@ export function toSceneRadius(body: BodyData): number {
 
 // Scene structure per body:
 //   root (heliocentric position)
-//   ├─ tilt (axial tilt) ─ mesh (scaled sphere; spins in M3) ─ rings
+//   ├─ pole (real pole orientation) ─ mesh (scaled sphere, spins) ─ rings
 //   └─ label (stays upright above the body)
 export interface BodyView {
   data: BodyData
   root: Group
+  pole: Group
   mesh: Mesh
 }
 
@@ -78,20 +82,28 @@ export function createBodies(scene: Scene, date: Date): Map<string, BodyView> {
       )
     }
 
-    const tilt = new Group()
-    tilt.rotation.z = MathUtils.degToRad(body.axialTiltDeg)
-    tilt.add(mesh)
+    const pole = new Group()
+    pole.add(mesh)
 
     const root = new Group()
-    root.add(tilt, createLabel(body.name, radius * 1.25 + 1.5))
+    root.add(pole, createLabel(body.name, radius * 1.25 + 1.5))
     if (body.emissive) root.add(createSunGlow(radius * 7))
-    heliocentricPosition(body.id as Body, date, root.position)
     scene.add(root)
 
     if (body.orbitalPeriodDays) {
       scene.add(createOrbitLine(body.id as Body, date, body.orbitalPeriodDays))
     }
-    views.set(body.id, { data: body, root, mesh })
+    views.set(body.id, { data: body, root, pole, mesh })
   }
+  updateBodies(views, date)
   return views
+}
+
+// Move every body to where it is at `date` and spin it to its real rotation.
+export function updateBodies(views: Map<string, BodyView>, date: Date): void {
+  for (const { data, root, pole, mesh } of views.values()) {
+    const body = data.id as Body
+    heliocentricPosition(body, date, root.position)
+    mesh.rotation.y = bodyOrientation(body, date, pole.quaternion)
+  }
 }

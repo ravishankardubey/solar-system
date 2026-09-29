@@ -11,11 +11,12 @@ import {
 } from 'three'
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js'
 import { setMaxAnisotropy } from './assets/index.ts'
-import { createBodies } from './bodies/index.ts'
+import { createBodies, updateBodies } from './bodies/index.ts'
 import { createCameraController } from './camera/index.ts'
 import { SimClock } from './clock/index.ts'
 import { createSky } from './sky/index.ts'
 import { mountCredits } from './ui/credits.ts'
+import { mountTimeControls } from './ui/timeControls.ts'
 
 const MAX_PIXEL_RATIO = 2
 const FOV = 45
@@ -39,6 +40,8 @@ const camera = new PerspectiveCamera(FOV, 1, 0.1, 5000)
 camera.position.set(0, 150, 420)
 
 const clock = new SimClock()
+// Respect reduced-motion: start paused and let the user press play.
+clock.playing = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const timer = new Timer()
 
 // Sunlight doesn't fall off with distance at this compressed scale; a faint
@@ -47,9 +50,10 @@ scene.add(new PointLight(0xfff5e8, 3.2, 0, 0))
 scene.add(new AmbientLight(0xffffff, 0.06))
 
 const stars = createSky(scene)
-createBodies(scene, clock.date)
+const views = createBodies(scene, clock.date)
 const controls = createCameraController(camera, canvas)
 mountCredits(document.body)
+const timeControls = mountTimeControls(document.body, clock)
 
 function resize(): void {
   const { clientWidth: w, clientHeight: h } = canvas
@@ -75,6 +79,8 @@ resize()
 function frame(time: number): void {
   timer.update(time)
   clock.tick(timer.getDelta())
+  updateBodies(views, clock.date)
+  timeControls.update()
   controls.update()
   // Stars sit at "infinity": keep them centred on the camera so zooming
   // never reaches them.
